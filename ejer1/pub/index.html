@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>en index</h1>
+    <div id="ingreso">
+        <h1>Crear archivo</h1>
+        <form action="/crear" method ="POST">
+            <p>
+                <label for="">Nombre del archivo</label><br>
+                <input type="text" id="nombre" name="nombre">
+            </p>
+            <p>    
+                <label for="">Contenido del archivo</label><br>
+                <input type="text" id="contenido" name="contenido">
+            </p>
+            <input type="button" value="Agregar archivo" id="bSubmit">
+        </form>
+        <div id="lista"></div>
+    </div>
+    <script>
+        const bSubmit= document.querySelector('#bSubmit');
+        loadArchivos()
+            bSubmit.addEventListener('click',()=>{
+            const nombre = document.querySelector('#nombre').value;
+            const contenido = document.querySelector('#contenido').value;
+
+            if(nombre.trim() === '' || contenido.trim() === '') return false;
+
+            fetch('/crear', {
+                method: 'POST', 
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({nombre: nombre})
+            })
+            .then(res => res.text())
+            .then(data =>{
+                // mostrar mensaje de error/éxito
+                alert(data);
+
+                //actualizar lista de peliculas
+                loadArchivos();
+            });
+
+            })
+
+            function loadArchivos(){
+            fetch('/get-archivos', {method: 'GET'})
+            .then(res => res.json())
+            .then(data =>{
+                const archivos = document.querySelector('#lista');
+                let html = '';
+                data.archivos.forEach(archivo =>{
+                    html += `<div>${archivo.nombre} </div>`
+                });
+                archivos.innerHTML = html;
+            });
+        }
+
+    </script>
+</body>
+</html>
